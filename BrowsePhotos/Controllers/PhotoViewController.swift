@@ -9,6 +9,7 @@ import UIKit
 import Alamofire
 import SDWebImage
 import CoreLocation
+import Localize_Swift
 
 
 class PhotoViewController: UIViewController {
@@ -42,11 +43,33 @@ class PhotoViewController: UIViewController {
     var locationManager = CLLocationManager()
     var currentlocation:CLLocation!
     
-    
+    // sheet for language switching
+    var actionSheet: UIAlertController!
+    // available localizable languages
+    let availableLanguages = Localize.availableLanguages()
     
     
 
     @IBAction func localizeButtonTapped(_ sender: Any) {
+        
+        actionSheet = UIAlertController(title: nil, message: "Switch Language", preferredStyle: UIAlertController.Style.actionSheet)
+        for language in availableLanguages {
+            let displayName = Localize.displayNameForLanguage(language)
+            if displayName == "" {
+                continue
+            }
+            
+            let languageAction = UIAlertAction(title: displayName, style: .default, handler: {
+                (alert: UIAlertAction!) -> Void in
+                    Localize.setCurrentLanguage(language)
+            })
+            actionSheet.addAction(languageAction)
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertAction.Style.cancel, handler: {
+            (alert: UIAlertAction) -> Void in
+        })
+        actionSheet.addAction(cancelAction)
+        self.present(actionSheet, animated: true, completion: nil)
     }
     
     @IBAction func photosNearMeButtonTapped(_ sender: Any) {
@@ -107,8 +130,32 @@ class PhotoViewController: UIViewController {
         locationManager.startMonitoringSignificantLocationChanges()
         
         
+        // set title for buttons used for localization
+        self.setText()
+        
+        
         
      }
+    
+    
+    // Add an observer for LCLLanguageChangeNotification on viewWillAppear. This is posted whenever a language changes and allows the viewcontroller to make the necessary UI updated. Very useful for places in your app when a language change might happen.
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            NotificationCenter.default.addObserver(self, selector: #selector(setText), name: NSNotification.Name( LCLLanguageChangeNotification), object: nil)
+        }
+    
+    // Remove the LCLLanguageChangeNotification on viewWillDisappear
+       override func viewWillDisappear(_ animated: Bool) {
+           super.viewWillDisappear(animated)
+           NotificationCenter.default.removeObserver(self)
+       }
+    
+    // MARK: Localized Text
+        
+        @objc func setText(){
+            localizeButton.setTitle("Localize".localized(using: "Localizable"), for: UIControl.State.normal)
+            photosNearMeButton.setTitle("Photos Near Me".localized(using: "Localizable"), for: UIControl.State.normal)
+        }
     
     
     func fetchAllPhotos(){
