@@ -10,7 +10,7 @@ import Alamofire
 import SDWebImage
 import CoreLocation
 import Localize_Swift
-
+import ProgressHUD
 
 class PhotoViewController: UIViewController {
     @IBOutlet weak var searchBar: UISearchBar!
@@ -134,6 +134,12 @@ class PhotoViewController: UIViewController {
         self.setText()
         
         
+        // progress loader
+        ProgressHUD.colorAnimation = .systemBlue
+        ProgressHUD.colorProgress = .systemBlue
+        ProgressHUD.animationType = .lineScaling
+        
+        
         
      }
     
@@ -159,9 +165,15 @@ class PhotoViewController: UIViewController {
     
     
     func fetchAllPhotos(){
+        // loader
+        ProgressHUD.show()
         
         fetchAllFlickerPhotos { (response, error) in
             if (error != nil){
+                DispatchQueue.main.async {
+                    ProgressHUD.dismiss()
+                }
+
               }
               else{
                   print("successful")
@@ -188,6 +200,8 @@ class PhotoViewController: UIViewController {
                           weakSelf?.photosArray = weakSelf?.photosResponse.photos.photo
                           // reloading collection view
                           weakSelf?.reloadCollectionViewData()
+                          ProgressHUD.dismiss()
+
 
                       }
                   }else{
@@ -197,6 +211,8 @@ class PhotoViewController: UIViewController {
                           weakSelf?.photoCollectionView.reloadData()
                           // is api request is in progress or not
                           weakSelf?.isRequestInProgress = false
+                          ProgressHUD.dismiss()
+
 
                       }
                   }
