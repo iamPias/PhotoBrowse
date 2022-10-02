@@ -10,12 +10,14 @@ PODS:
   - SDWebImage (5.13.4):
     - SDWebImage/Core (= 5.13.4)
   - SDWebImage/Core (5.13.4)
+  - Toast-Swift (5.0.1)
 
 DEPENDENCIES:
   - Alamofire
   - Localize-Swift
   - ProgressHUD
   - SDWebImage
+  - Toast-Swift
 
 SPEC REPOS:
   trunk:
@@ -23,13 +25,15 @@ SPEC REPOS:
     - Localize-Swift
     - ProgressHUD
     - SDWebImage
+    - Toast-Swift
 
 SPEC CHECKSUMS:
   Alamofire: d368e1ff8a298e6dde360e35a3e68e6c610e7204
   Localize-Swift: 6f4475136bdb0d7b2882ea3d4ea919d70142b232
   ProgressHUD: 4bdaa0d2ddf676b23324b199f9facffb5c3a1620
   SDWebImage: e5cc87bf736e60f49592f307bdf9e157189298a3
+  Toast-Swift: 9b6a70f28b3bf0b96c40d46c0c4b9d6639846711
 
-PODFILE CHECKSUM: a399868c2850abab5ecb534b644118f00a1a413e
+PODFILE CHECKSUM: dd45bce844d768a9148ecf6a86f25b268a554c11
 
 COCOAPODS: 1.11.3

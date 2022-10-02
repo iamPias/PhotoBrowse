@@ -10,7 +10,7 @@ target 'BrowsePhotos' do
   pod 'SDWebImage'
   pod 'Localize-Swift'
   pod 'ProgressHUD'
-
+  pod 'Toast-Swift'
 
   target 'BrowsePhotosTests' do
     inherit! :search_paths

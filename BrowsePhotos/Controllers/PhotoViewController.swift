@@ -11,6 +11,7 @@ import SDWebImage
 import CoreLocation
 import Localize_Swift
 import ProgressHUD
+import Toast_Swift
 
 class PhotoViewController: UIViewController {
     @IBOutlet weak var searchBar: UISearchBar!
@@ -171,6 +172,7 @@ class PhotoViewController: UIViewController {
         fetchAllFlickerPhotos { (response, error) in
             if (error != nil){
                 DispatchQueue.main.async {
+                    self.view.makeToast("Could not load data", duration: 3.0, position: .bottom)
                     ProgressHUD.dismiss()
                 }
 
