@@ -7,6 +7,8 @@
 
 import UIKit
 import Alamofire
+import SDWebImage
+
 
 
 class PhotoViewController: UIViewController {
@@ -58,21 +60,31 @@ class PhotoViewController: UIViewController {
         
         fetchAllFlickerPhotos { (response, error) in
             if (error != nil){
-                  print("error signing in")
               }
               else{
                   print("successful")
                   weak var weakSelf = self
+                  
+                  // photo counting
                   self.newObjectsCount = response!.photos.photo.count
                   if weakSelf?.photosResponse != nil {
+                      
+                      //flicker photo page number
                       weakSelf?.photosResponse.photos.page = response!.photos.page
+                      //flicker total page number
                       weakSelf?.photosResponse.photos.pages = response!.photos.pages
+                      //flicker photo loading on each page
                       weakSelf?.photosResponse.photos.perpage = response!.photos.perpage
+                      //flicker total photo counting
                       weakSelf?.photosResponse.photos.total = response!.photos.total
+                      // appending photo during scrolling
                       weakSelf?.photosResponse.photos.photo.append(contentsOf: response!.photos.photo)
+                      // status of flicker photo
                       weakSelf?.photosResponse.stat = response!.stat
                       DispatchQueue.main.async {
+                          //photo array from photo response
                           weakSelf?.photosArray = weakSelf?.photosResponse.photos.photo
+                          // reloading collection view
                           weakSelf?.reloadCollectionViewData()
 
                       }
@@ -81,6 +93,7 @@ class PhotoViewController: UIViewController {
                       weakSelf?.photosArray = weakSelf?.photosResponse.photos.photo
                       DispatchQueue.main.async {
                           weakSelf?.photoCollectionView.reloadData()
+                          // is api request is in progress or not
                           weakSelf?.isRequestInProgress = false
 
                       }
@@ -98,10 +111,12 @@ class PhotoViewController: UIViewController {
             "Accept": "application/json"
         ]
         
+        // determinig page number
         let currentPage = newObjectsCount < Constants.per_page - 2 ? 1 : photosResponse.photos.page + 1
         
         var imageUrlString: String =  String(format: "%@&page=%d&text=%@", ServerConfig.imageSearchUrl, currentPage, searchBar.text!)
         
+        // url encoding
         let urlString: String = imageUrlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
 
         
@@ -110,10 +125,10 @@ class PhotoViewController: UIViewController {
               response in
 
               switch response.result {
-              case .success(let data):
+              case .success(let data):  // on api response success
                   print(data)
                   completion(data,nil)
-              case .failure(let error):
+              case .failure(let error): // on api response failure
                   print(error)
                   completion(nil,error)
 
@@ -136,6 +151,15 @@ extension PhotoViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // On Tap SearchButton keyboard will dismiss
         searchBar.resignFirstResponder()
+        
+        //removing current search result
+        newObjectsCount = 0
+        photosResponse = nil
+        photosArray = [Photo]()
+        photoCollectionView.reloadData()
+        
+        // making api call again for new search string
+        fetchAllPhotos()
 
     }
 }
@@ -145,14 +169,36 @@ extension PhotoViewController: UISearchBarDelegate {
 extension PhotoViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        guard let photos = photosArray else {
+            return 0
+        }
+        return photos.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        // loading collection view cell from storyboard
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCollectionViewCell", for: indexPath) as! PhotoCollectionViewCell
+        
+        // loading photo object
+        let photoObject: Photo = photosArray[indexPath.row]
+        
+        // flicker image url
+        let imageUrlString = String(format: "https://farm%d.static.flickr.com/%@/%@_%@.jpg", photoObject.farm, photoObject.server, photoObject.id, photoObject.secret)
+        
+        // image caching using sdwebimage
+        cell.photoImageView.sd_setImage(with: URL(string:imageUrlString ), placeholderImage: UIImage(named: "placeholder.png"))
+        
+        return cell
     }
     
     
     public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath)
     {
+        // progressive api call during photo gallery scrolling
+        if isLoadingCell(for: indexPath) && !isRequestInProgress {
+            fetchAllPhotos()
+        }
 
     }
 
@@ -166,11 +212,50 @@ extension PhotoViewController: UICollectionViewDelegate {
     }
 }
 
-extension ViewController: UICollectionViewDelegateFlowLayout {
+extension PhotoViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         let itemWidth = UIScreen.main.bounds.size.width/3 - 1
         return CGSize.init(width: itemWidth, height: itemWidth)    }
     
+}
+
+
+private extension PhotoViewController {
+    
+    // is photo collection view cell loading
+    func isLoadingCell(for indexPath: IndexPath) -> Bool {
+        return indexPath.row >= photosResponse.photos.photo.count - 5
+    }
+    
+    // reloading collection view after api  response
+    func reloadCollectionViewData() {
+        let newIndexPathsToReload = calculateIndexPathsToReload()
+        if newIndexPathsToReload.count == 0 {
+            photoCollectionView.reloadData()
+            return
+        }
+
+        self.photoCollectionView.performBatchUpdates({[weak self] in
+            self?.photoCollectionView.insertItems(at: newIndexPathsToReload)
+        }, completion: {[weak self](success) in
+            self?.isRequestInProgress = false
+        })
+    }
+    
+    
+    // finding visible collection view photo cell
+    func visibleIndexPathsToReload(intersecting indexPaths: [IndexPath]) -> [IndexPath] {
+        let indexPathsForVisibleRows = photoCollectionView.indexPathsForVisibleItems
+        let indexPathsIntersection = Set(indexPathsForVisibleRows).intersection(indexPaths)
+        return Array(indexPathsIntersection)
+    }
+    
+    // calculating collectionview indexpath
+    private func calculateIndexPathsToReload() -> [IndexPath] {
+        let startIndex = photosResponse.photos.photo.count - newObjectsCount
+        let endIndex = startIndex + newObjectsCount
+        return (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
+    }
 }
