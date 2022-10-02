@@ -208,7 +208,21 @@ extension PhotoViewController: UICollectionViewDataSource {
 extension PhotoViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    
+        
+        // loading selected photo
+        let photoObject: Photo = photosArray[indexPath.row]
+        
+        // main storyboard file
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        
+        // loading photo detail viewcontroller from storyboard with identifier
+        let photoDetailViewController = storyboard.instantiateViewController(withIdentifier: "PhotoDetailViewController") as! PhotoDetailViewController
+        
+        // passing selected photo from gallery to detail view controller
+        photoDetailViewController.photo = photoObject
+        
+        // pushing view controller on navigation
+        self.navigationController?.pushViewController(photoDetailViewController, animated: false)
     }
 }
 
