@@ -28,11 +28,17 @@
                                         <rect key="frame" x="10" y="10" width="77" height="50"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" title="Localize"/>
+                                        <connections>
+                                            <action selector="localizeButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="nIf-dD-iRF"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RdE-5Z-pFi">
                                         <rect key="frame" x="97" y="10" width="307" height="50"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" title="Photos Near Me"/>
+                                        <connections>
+                                            <action selector="photosNearMeButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="baz-bE-5xi"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>

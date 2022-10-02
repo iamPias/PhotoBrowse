@@ -8,7 +8,7 @@
 import UIKit
 import Alamofire
 import SDWebImage
-
+import CoreLocation
 
 
 class PhotoViewController: UIViewController {
@@ -28,12 +28,54 @@ class PhotoViewController: UIViewController {
     // detecting is network call is in progress or not
     var isRequestInProgress: Bool = false
     
+    // is photos nearme
+    var isNearby: Bool = false
+
+    
     // photo count
     var newObjectsCount: Int = 0
     
     // flicker photos array
     var photosArray: [Photo]!
+    
+    //location manager for user's current location
+    var locationManager = CLLocationManager()
+    var currentlocation:CLLocation!
+    
+    
+    
+    
 
+    @IBAction func localizeButtonTapped(_ sender: Any) {
+    }
+    
+    @IBAction func photosNearMeButtonTapped(_ sender: Any) {
+        
+        // photos near me is true
+        isNearby = true
+        
+        //removing current search result
+        newObjectsCount = 0
+        photosResponse = nil
+        photosArray = [Photo]()
+        photoCollectionView.reloadData()
+        
+        // making new api call with latitude and longitude
+        fetchAllPhotos()
+    }
+    
+    func authorizelocationstates(){
+         if CLLocationManager.authorizationStatus() == .authorizedWhenInUse ||
+                CLLocationManager.authorizationStatus() ==  .authorizedAlways {
+             currentlocation = locationManager.location
+             print(currentlocation)
+         }
+         else{
+             // Note : This function is overlap permission
+             //  locationManager.requestWhenInUseAuthorization()
+            //  authorizelocationstates()
+         }
+     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,6 +95,19 @@ class PhotoViewController: UIViewController {
         flowLayout.minimumInteritemSpacing = 1.0
         flowLayout.minimumLineSpacing = 1
         photoCollectionView.collectionViewLayout = flowLayout
+        
+        
+        // for getting user's current location
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+          // Get Location Permission one time only
+        locationManager.requestWhenInUseAuthorization()
+          // Need to update location and get location data in locationManager object with delegate
+        locationManager.startUpdatingLocation()
+        locationManager.startMonitoringSignificantLocationChanges()
+        
+        
+        
      }
     
     
@@ -114,13 +169,21 @@ class PhotoViewController: UIViewController {
         // determinig page number
         let currentPage = newObjectsCount < Constants.per_page - 2 ? 1 : photosResponse.photos.page + 1
         
-        var imageUrlString: String =  String(format: "%@&page=%d&text=%@", ServerConfig.imageSearchUrl, currentPage, searchBar.text!)
+        var imageUrlString: String
         
-        // url encoding
+        if isNearby { // photos nearme using user's current latitude and longitude
+            imageUrlString = String(format: "%@&page=%d&lat=%@&lon=%@", ServerConfig.imageSearchUrl, currentPage,String(currentlocation.coordinate.latitude),String(currentlocation.coordinate.longitude))
+
+        }else {
+            // searching photos by user's provided string
+           imageUrlString = String(format: "%@&page=%d&text=%@", ServerConfig.imageSearchUrl, currentPage, searchBar.text!)
+        }
+        
+        // url encoding for dealing space between words in url
         let urlString: String = imageUrlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
 
         
-        
+        // api calling using alamofire
         AF.request(urlString, method: .get, headers: headers).responseDecodable(of: PhotoResponse.self) {
               response in
 
@@ -137,6 +200,10 @@ class PhotoViewController: UIViewController {
           }
 
     }
+    
+    
+    
+    
 
 
 }
@@ -151,6 +218,10 @@ extension PhotoViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // On Tap SearchButton keyboard will dismiss
         searchBar.resignFirstResponder()
+        
+        // photos nearme is off
+        isNearby = false
+
         
         //removing current search result
         newObjectsCount = 0
@@ -271,5 +342,16 @@ private extension PhotoViewController {
         let startIndex = photosResponse.photos.photo.count - newObjectsCount
         let endIndex = startIndex + newObjectsCount
         return (startIndex..<endIndex).map { IndexPath(row: $0, section: 0) }
+    }
+}
+
+
+
+extension PhotoViewController: CLLocationManagerDelegate {
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        locationManager = manager
+        // Only called when variable have location data
+        authorizelocationstates()
     }
 }
