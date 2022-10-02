@@ -6,6 +6,8 @@
 //
 
 import UIKit
+import Alamofire
+
 
 class PhotoViewController: UIViewController {
     @IBOutlet weak var searchBar: UISearchBar!
@@ -16,6 +18,20 @@ class PhotoViewController: UIViewController {
     
     @IBOutlet weak var photoCollectionView: UICollectionView!
     var flowLayout:UICollectionViewFlowLayout! = nil
+    
+    
+    // main response from api
+    var photosResponse: PhotoResponse!
+    
+    // detecting is network call is in progress or not
+    var isRequestInProgress: Bool = false
+    
+    // photo count
+    var newObjectsCount: Int = 0
+    
+    // flicker photos array
+    var photosArray: [Photo]!
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +52,77 @@ class PhotoViewController: UIViewController {
         flowLayout.minimumLineSpacing = 1
         photoCollectionView.collectionViewLayout = flowLayout
      }
+    
+    
+    func fetchAllPhotos(){
+        
+        fetchAllFlickerPhotos { (response, error) in
+            if (error != nil){
+                  print("error signing in")
+              }
+              else{
+                  print("successful")
+                  weak var weakSelf = self
+                  self.newObjectsCount = response!.photos.photo.count
+                  if weakSelf?.photosResponse != nil {
+                      weakSelf?.photosResponse.photos.page = response!.photos.page
+                      weakSelf?.photosResponse.photos.pages = response!.photos.pages
+                      weakSelf?.photosResponse.photos.perpage = response!.photos.perpage
+                      weakSelf?.photosResponse.photos.total = response!.photos.total
+                      weakSelf?.photosResponse.photos.photo.append(contentsOf: response!.photos.photo)
+                      weakSelf?.photosResponse.stat = response!.stat
+                      DispatchQueue.main.async {
+                          weakSelf?.photosArray = weakSelf?.photosResponse.photos.photo
+                          weakSelf?.reloadCollectionViewData()
+
+                      }
+                  }else{
+                      weakSelf?.photosResponse = response
+                      weakSelf?.photosArray = weakSelf?.photosResponse.photos.photo
+                      DispatchQueue.main.async {
+                          weakSelf?.photoCollectionView.reloadData()
+                          weakSelf?.isRequestInProgress = false
+
+                      }
+                  }
+                  
+              }
+        }
+
+    }
+
+    
+    func fetchAllFlickerPhotos(completion:@escaping (_ responses:PhotoResponse?, _ error:Error?) -> Void) {
+        
+        let headers: HTTPHeaders = [
+            "Accept": "application/json"
+        ]
+        
+        let currentPage = newObjectsCount < Constants.per_page - 2 ? 1 : photosResponse.photos.page + 1
+        
+        var imageUrlString: String =  String(format: "%@&page=%d&text=%@", ServerConfig.imageSearchUrl, currentPage, searchBar.text!)
+        
+        let urlString: String = imageUrlString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
+
+        
+        
+        AF.request(urlString, method: .get, headers: headers).responseDecodable(of: PhotoResponse.self) {
+              response in
+
+              switch response.result {
+              case .success(let data):
+                  print(data)
+                  completion(data,nil)
+              case .failure(let error):
+                  print(error)
+                  completion(nil,error)
+
+              }
+
+          }
+
+    }
+
 
 }
 
