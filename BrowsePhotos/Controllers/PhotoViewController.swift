@@ -21,6 +21,10 @@ class PhotoViewController: UIViewController {
         
         // SearchBar Delegate
         searchBar.delegate = self
+        
+        // CollectionView Data Source and Delegate Methods
+        photoCollectionView.dataSource = self
+        photoCollectionView.delegate = self
      }
 
 }
@@ -36,5 +40,31 @@ extension PhotoViewController: UISearchBarDelegate {
         // On Tap SearchButton keyboard will dismiss
         searchBar.resignFirstResponder()
 
+    }
+}
+
+
+
+extension PhotoViewController: UICollectionViewDataSource {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    }
+    
+    
+    public func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath)
+    {
+
+    }
+
+}
+
+
+extension PhotoViewController: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    
     }
 }
