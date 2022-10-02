@@ -1,0 +1,6 @@
+framework module Pods_BrowsePhotosTests {
+  umbrella header "Pods-BrowsePhotosTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
