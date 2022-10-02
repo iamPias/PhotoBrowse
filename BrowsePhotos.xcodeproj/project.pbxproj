@@ -20,6 +20,7 @@
 		C1AEA6BA28E9C5D400FF57C4 /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1AEA6B928E9C5D400FF57C4 /* PhotoViewController.swift */; };
 		C1AEA6BC28E9C82500FF57C4 /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1AEA6BB28E9C82500FF57C4 /* PhotoCollectionViewCell.swift */; };
 		C1AEA6BE28E9C8DE00FF57C4 /* PhotoDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1AEA6BD28E9C8DE00FF57C4 /* PhotoDetailViewController.swift */; };
+		C1AEA6C028E9CB1400FF57C4 /* ServerConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1AEA6BF28E9CB1400FF57C4 /* ServerConfiguration.swift */; };
 		D39507099F4C264642676551 /* Pods_BrowsePhotosTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 38E623D316B88245933A0BAD /* Pods_BrowsePhotosTests.framework */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +65,7 @@
 		C1AEA6B928E9C5D400FF57C4 /* PhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
 		C1AEA6BB28E9C82500FF57C4 /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
 		C1AEA6BD28E9C8DE00FF57C4 /* PhotoDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoDetailViewController.swift; sourceTree = "<group>"; };
+		C1AEA6BF28E9CB1400FF57C4 /* ServerConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerConfiguration.swift; sourceTree = "<group>"; };
 		CB30E7E9FCF09652B4BD159C /* Pods_BrowsePhotos.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BrowsePhotos.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -201,6 +203,7 @@
 		C1AEA6B628E9C57D00FF57C4 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				C1AEA6BF28E9CB1400FF57C4 /* ServerConfiguration.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -465,6 +468,7 @@
 				C1AEA68628E9C41B00FF57C4 /* SceneDelegate.swift in Sources */,
 				C1AEA6BE28E9C8DE00FF57C4 /* PhotoDetailViewController.swift in Sources */,
 				C1AEA6BA28E9C5D400FF57C4 /* PhotoViewController.swift in Sources */,
+				C1AEA6C028E9CB1400FF57C4 /* ServerConfiguration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
