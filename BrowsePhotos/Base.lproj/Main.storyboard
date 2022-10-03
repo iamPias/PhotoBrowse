@@ -9,7 +9,7 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Photo View Controller-->
+        <!--Flicker Photo Browse-->
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="PhotoViewController" customModule="BrowsePhotos" customModuleProvider="target" sceneMemberID="viewController">
@@ -103,7 +103,7 @@
                             <constraint firstItem="4mi-AW-LF1" firstAttribute="top" secondItem="IE1-07-jWs" secondAttribute="bottom" constant="10" id="nK4-Ya-j2D"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="Q6v-Qy-m7k"/>
+                    <navigationItem key="navigationItem" title="Flicker Photo Browse" id="Q6v-Qy-m7k"/>
                     <connections>
                         <outlet property="localizeButton" destination="yor-E9-ln4" id="s2n-sq-ti3"/>
                         <outlet property="photoCollectionView" destination="4mi-AW-LF1" id="U9t-VH-Pyu"/>
